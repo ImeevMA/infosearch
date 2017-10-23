@@ -13,8 +13,8 @@ class Searcher:
                 pos = int(line.split()[1])
                 size = int(line.split()[2])
                 self.index.seek(pos)
-                return varbyte(array('B', self.index.read(size)), True)
-        return None
+                return set(varbyte(array('B', self.index.read(size)), True))
+        return set()
 
 #words = ["ali", "al", "cat", "array"]
 #searcher = Search()

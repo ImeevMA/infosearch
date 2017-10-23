@@ -5,7 +5,8 @@ import struct
 import gzip
 import sys
 
-from searcher import Searcher
+from docreader import DocumentStreamReader
+from index_creation import Index
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='compressed documents reader')
@@ -15,8 +16,9 @@ def parse_command_line():
 
 if __name__ == '__main__':
     args = parse_command_line().args
-    search = Searcher()
-    result = search.search_word(args.pop())
-    for word in args:
-        result &= search.search_word(word)
-    print result
+    compression = args.pop(0)
+    reader = DocumentStreamReader(args)
+    indexer = Index()
+    for doc_id, doc in enumerate(reader):
+        indexer.handle_doc(doc, doc_id)
+    indexer.save_index()

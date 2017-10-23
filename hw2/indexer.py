@@ -29,11 +29,14 @@ class Indexer:
         size = 0
         fdict = open(self.dict_name, "w")
         findex = open(self.index_name, "wb")
+        flinks = open(self.links, "w")
         for word in sorted(self.index.keys()):
             size = len(self.index[word][1])
             fdict.write(word.encode("UTF-8") + " {} {}\n".format(pos, size))
             pos += size
             self.index[word][1].tofile(findex)
+        for link in self.links:
+            flinks.write(link.encode("UTF-8") + "\n")
 
 
 #reader = DocumentStreamReader(["/home/mergen/sphere/infosearch/hw2test/1.gz"])
