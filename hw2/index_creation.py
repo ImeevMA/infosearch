@@ -1,28 +1,47 @@
 #!/usr/bin/env python
+from array import array
+from compression import varbyte
 from docreader import DocumentStreamReader
 from doc2words import extract_words
+from nltk.corpus import stopwords
 
-import argparse
-import document_pb2
-import struct
-import gzip
-import sys
+from base64 import b64encode
 
-def get_index(doc, index='index.txt'):
-    words = extract_words(doc.text)
-    fd = open(index, "w")
+def doc_get_words(doc, doc_id, result = dict()):
+   # sw = set(stopwords.words('russian')) | set(stopwords.words('english'));
+    words = set(extract_words(doc.text));
     for word in words:
-        fd.write(word.encode("UTF-8") + '\n')
-    fd.close()
+        result[word] = add_to_index(result.get(word, (0, array('B'))), doc_id)
+    return result
 
-def parse_command_line():
-    parser = argparse.ArgumentParser(description='compressed documents reader')
-    parser.add_argument('files', nargs='+', help='Input files (.gz or plain) to process')
-    return parser.parse_args()
+def add_to_index(last, num):
+    last_id, arr = last
+    for byte in varbyte(num - last_id):
+        arr.append(byte)
+    return (num, arr)
 
-if __name__ == '__main__':
-    reader = DocumentStreamReader(parse_command_line().files)
-    for doc in reader:
-        get_index(doc);
-        print "%s\t%d bytes" % (doc.url, len(doc.text))
-        break
+def save_index(index):
+    pos = 0
+    size = 0
+    fdict = open("dictionary", "w")
+    findex = open("index", "w")
+    for word in sorted(index.keys()):
+        size = len(index[word][1])
+        fdict.write(word.encode("UTF-8") + " {} {}\n".format(pos, size))
+        pos += size
+        index[word][1].tofile(findex)
+
+
+
+
+
+
+reader = DocumentStreamReader(["/home/mergen/sphere/infosearch/hw2test/1.gz"])
+
+result = dict()
+for i, doc in enumerate(reader):
+    doc_get_words(doc, i, result)
+
+#save_index(result)
+#for i, v in result.items():
+#    print i.encode('UTF-8'), v
