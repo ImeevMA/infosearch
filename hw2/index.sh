@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./indexer.py {}
+python index_create.py $@

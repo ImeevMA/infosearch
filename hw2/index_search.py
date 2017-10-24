@@ -18,5 +18,6 @@ if __name__ == '__main__':
     search = Searcher()
     result = search.search_word(args.pop())
     for word in args:
-        result &= search.search_word(word)
+        if word != '&':
+            result &= search.search_word(word)
     print result

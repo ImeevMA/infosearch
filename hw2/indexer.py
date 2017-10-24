@@ -9,11 +9,12 @@ from base64 import b64encode
 
 class Indexer:
 
-    def __init__(self, dict_name="dictionary", index_name="index"):
+    def __init__(self, dict_name="dictionary", index_name="index", link_name="links"):
         self.index = dict()
         self.links = list()
         self.dict_name = dict_name
         self.index_name = index_name
+        self.link_name = link_name
 
     def handle_doc(self, doc, doc_id):
         self.links.append(doc.url)
@@ -29,7 +30,8 @@ class Indexer:
         size = 0
         fdict = open(self.dict_name, "w")
         findex = open(self.index_name, "wb")
-        flinks = open(self.links, "w")
+        flinks = open(self.link_name, "w")
+        print "!\n", self.link_name
         for word in sorted(self.index.keys()):
             size = len(self.index[word][1])
             fdict.write(word.encode("UTF-8") + " {} {}\n".format(pos, size))
