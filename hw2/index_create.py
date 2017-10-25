@@ -6,7 +6,7 @@ import gzip
 import sys
 
 from docreader import DocumentStreamReader
-from index_creation import Index
+from indexer import Indexer
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='compressed documents reader')
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     args = parse_command_line().args
     compression = args.pop(0)
     reader = DocumentStreamReader(args)
-    indexer = Index()
+    indexer = Indexer()
     for doc_id, doc in enumerate(reader):
         indexer.handle_doc(doc, doc_id)
     indexer.save_index()

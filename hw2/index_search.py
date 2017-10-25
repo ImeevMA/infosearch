@@ -21,3 +21,4 @@ if __name__ == '__main__':
         if word != '&':
             result &= search.search_word(word)
     print result
+    print search.get_links(result)
