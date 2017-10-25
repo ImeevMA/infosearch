@@ -20,5 +20,6 @@ if __name__ == '__main__':
     for word in args:
         if word != '&':
             result &= search.search_word(word)
-    print result
-    print search.get_links(result)
+    print len(result)
+    for link in search.get_links(result):
+        print link

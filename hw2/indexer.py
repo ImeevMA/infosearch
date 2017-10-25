@@ -45,5 +45,4 @@ class Indexer:
             self.index[word_hash][1].tofile(findex)
         for link in self.links:
             ftoclinks.write(pack("q", flinks.tell()))
-            print calcsize("q"),
             flinks.write(link.encode("UTF-8") + "\n")
