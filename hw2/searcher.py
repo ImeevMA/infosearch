@@ -2,7 +2,7 @@ from os import stat
 from array import array
 from struct import unpack
 from mmhash import get_hash
-from compression import varbyte
+from compression import varbyte, VARBYTE, SIMPLE9
 
 class Searcher:
     def __init__(
@@ -20,6 +20,10 @@ class Searcher:
     def get_dict(self, filename):
         self.dictionary = dict()
         dictionary = open(filename, "rb")
+        if unpack("b", dictionary.read(1))[0] == SIMPLE9:
+            self.compression = varbyte
+        else:
+            self.compression = varbyte
         tmp = dictionary.read(24)
         while(tmp):
             unpacked = unpack("qqq", tmp)
@@ -42,9 +46,9 @@ class Searcher:
         return links
 
     def search_word(self, word):
-        word_hash = get_hash(word)
+        word_hash = get_hash(word.encode("UTF-8"))
         pos, size = self.dictionary.get(word_hash, (0, 0))
         if size == 0:
             return set()
         self.index.seek(pos)
-        return set(varbyte(array('B', self.index.read(size)), True))
+        return set(self.compression(array('B', self.index.read(size)), True))
