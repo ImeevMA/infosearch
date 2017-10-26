@@ -5,6 +5,9 @@ from doc2words import extract_words
 from mmhash import get_hash
 from struct import pack, calcsize
 
+WORD = "range"
+test_hash = get_hash(WORD.encode("UTF-8"))
+
 class Indexer:
 
     def __init__(
@@ -33,7 +36,7 @@ class Indexer:
             self.index[word_hash] = (doc_id, arr)
 
     def save_index(self):
-        pos = 1
+        pos = 0
         size = 0
         fdict = open(self.dict_name, "wb")
         findex = open(self.index_name, "wb")
@@ -41,11 +44,11 @@ class Indexer:
         ftoclinks = open(self.tocl_name, "wb")
         fdict.write(pack("b", self.compression))
         for word_hash in sorted(self.index.keys()):
-            size = len(self.index[word_hash][1])
+            arr = varbyte(self.index[word_hash][1])
+            size = len(arr) * arr.itemsize
+            arr.tofile(findex)
             fdict.write(pack("qqq", word_hash, pos, size))
             pos += size
-            arr = varbyte(self.index[word_hash][1])
-            arr.tofile(findex)
         for link in self.links:
             ftoclinks.write(pack("q", flinks.tell()))
             flinks.write(link.encode("UTF-8") + "\n")

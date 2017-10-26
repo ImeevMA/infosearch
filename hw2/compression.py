@@ -3,6 +3,19 @@ from array import array
 VARBYTE = 0
 SIMPLE9 = 1
 SHIFT = 128
+CODE_SHIFT = 28
+SHIFTS = [28, 14, 9, 7, 5, 4, 3, 2, 1]
+NUMS = [
+    (1, (1 << SHIFTS[0]) - 1),
+    (2, (1 << SHIFTS[1]) - 1),
+    (3, (1 << SHIFTS[2]) - 1),
+    (4, (1 << SHIFTS[3]) - 1),
+    (5, (1 << SHIFTS[4]) - 1),
+    (7, (1 << SHIFTS[5]) - 1),
+    (9, (1 << SHIFTS[6]) - 1),
+    (14, (1 << SHIFTS[7]) - 1),
+    (28, (1 << SHIFTS[8]) - 1)
+    ]
 
 def varbyte(val, unpack=False):
     if unpack:
@@ -10,7 +23,6 @@ def varbyte(val, unpack=False):
     return varbyte_pack(val)
 
 def varbyte_pack(nums):
-    print nums
     arr = array("B")
     for num in nums:
         result = list()
@@ -23,7 +35,6 @@ def varbyte_pack(nums):
             num /= SHIFT
         result.insert(0, tmp)
         arr.extend(result)
-    print arr
     return arr
 
 def varbyte_unpack(arr):
@@ -46,5 +57,33 @@ def simple9(val, unpack=False):
         return simple9_unpack(val)
     return simple9_pack(val)
 
-def simple9_unpack(val):
-    pass
+def simple9_pack(nums):
+    arr = array("L")
+    if (arr.itemsize > 4):
+        arr = array("I")
+    while nums:
+        for i in xrange(1, len(NUMS)):
+            if max(nums[:NUMS[i][0]]) > NUMS[i][1]:
+                i -= 1
+                break
+            if len(nums) <= NUMS[i][0]:
+                break
+        num = 0
+        for j in xrange(min(NUMS[i][0], len(nums))):
+            num = (num << SHIFTS[i]) + nums.pop(0)
+        num += i << CODE_SHIFT
+        print bin(num), NUMS[i]
+        arr.append(num)
+    return arr
+
+def simple9_unpack(arr):
+    res = list()
+    for num in arr:
+        tmp = list()
+        i = num >> CODE_SHIFT
+        num = num & ((1 << CODE_SHIFT) - 1)
+        while num  > 0:
+            tmp.append(int(num & NUMS[i][1]))
+            num >>= SHIFTS[i]
+        res += tmp[::-1]
+    return res
