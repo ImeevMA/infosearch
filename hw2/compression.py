@@ -37,7 +37,8 @@ def varbyte_pack(nums):
         arr.extend(result)
     return arr
 
-def varbyte_unpack(arr):
+def varbyte_unpack(data):
+    arr = array('B', data)
     res = list()
     tmp = arr[0]
     new_id = 0
@@ -72,11 +73,15 @@ def simple9_pack(nums):
         for j in xrange(min(NUMS[i][0], len(nums))):
             num = (num << SHIFTS[i]) + nums.pop(0)
         num += i << CODE_SHIFT
-        print bin(num), NUMS[i]
         arr.append(num)
     return arr
 
-def simple9_unpack(arr):
+def simple9_unpack(data):
+    arr = array("L")
+    if (arr.itemsize == 4):
+        arr = array("L", data)
+    else:
+        arr = array("I", data)
     res = list()
     for num in arr:
         tmp = list()
@@ -85,5 +90,8 @@ def simple9_unpack(arr):
         while num  > 0:
             tmp.append(int(num & NUMS[i][1]))
             num >>= SHIFTS[i]
-        res += tmp[::-1]
+        for num in tmp[::-1]:
+            if res:
+                num += res[-1]
+            res.append(num)
     return res

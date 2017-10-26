@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from compression import varbyte, VARBYTE, SIMPLE9
+from compression import varbyte, simple9, VARBYTE, SIMPLE9
 from docreader import DocumentStreamReader
 from doc2words import extract_words
 from mmhash import get_hash
@@ -43,8 +43,12 @@ class Indexer:
         flinks = open(self.link_name, "wb")
         ftoclinks = open(self.tocl_name, "wb")
         fdict.write(pack("b", self.compression))
+        if (self.compression == SIMPLE9):
+            compression = simple9
+        else:
+            compression = varbyte
         for word_hash in sorted(self.index.keys()):
-            arr = varbyte(self.index[word_hash][1])
+            arr = compression(self.index[word_hash][1])
             size = len(arr) * arr.itemsize
             arr.tofile(findex)
             fdict.write(pack("qqq", word_hash, pos, size))

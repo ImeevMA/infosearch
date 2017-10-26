@@ -25,5 +25,5 @@ if __name__ == '__main__':
         compression = VARBYTE
     indexer = Indexer(compression)
     for doc_id, doc in enumerate(reader):
-        indexer.handle_doc(doc, doc_id)
+        indexer.handle_doc(doc, doc_id + 1)
     indexer.save_index()
