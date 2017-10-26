@@ -5,9 +5,6 @@ from doc2words import extract_words
 from mmhash import get_hash
 from struct import pack, calcsize
 
-WORD = "range"
-test_hash = get_hash(WORD.encode("UTF-8"))
-
 class Indexer:
 
     def __init__(
